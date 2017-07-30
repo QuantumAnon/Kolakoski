@@ -71,3 +71,15 @@ void Display(list *X)
   }  
   printf("end!\n");
 }
+
+//Displays a list on a single line
+void SequenceDisplay(list *X)
+{
+  node *cur;
+  cur = X->head;
+  while (cur){
+    printf("%d, ",cur->data); 
+    cur = cur->next;
+  }
+  printf("\n");  
+}

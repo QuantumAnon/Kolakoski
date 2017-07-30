@@ -16,5 +16,5 @@
 int main( int argc, const char* argv[] )
 {
   list K = Kolakoski(100);
-  Display(&K);
+  SequenceDisplay(&K);
 }
