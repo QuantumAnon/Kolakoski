@@ -1,17 +1,20 @@
+//====================
+//Kolakoski definition file
+//--------------------
+//Defines the Kolakoski generating function
+//====================
+
 #include "./List.h"
 #include "stdio.h"
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <termios.h>
-#include <unistd.h>
 
-int main( int argc, const char* argv[] )
+list Kolakoski(int n)
 {
   list K;
   K.head = NULL;
   node *cur;
-  for (int i = 0; i < 10000; i++)
+  for (int i = 0; i < n; i++)
   {
     if ((i == 0) || (i == 1))
     {
@@ -24,6 +27,5 @@ int main( int argc, const char* argv[] )
     {MultiAppend(&K, cur->data,2);}
     cur = cur->next;
   }
-  Display(&K);
-  return 0;
+  return K;
 }

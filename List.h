@@ -1,8 +1,8 @@
 #pragma once
 //====================
-//Defines lists and various functions on lists
+//List.h
 //--------------------
-//
+//Defines lists and various functions on lists
 //====================
 
 #include "stdio.h"
