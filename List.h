@@ -65,7 +65,8 @@ void Display(list *X)
   node *cur;
   cur = X->head;
   printf("start->");
-  while (cur){
+  while (cur)
+  {
     printf("%d->",cur->data); 
     cur = cur->next;
   }  
@@ -82,4 +83,34 @@ void SequenceDisplay(list *X)
     cur = cur->next;
   }
   printf("\n");  
+}
+
+//Find the size of a list
+int Size(list *X)
+{
+  node *cur;
+  cur = X->head;
+  int size = 0;
+  while (cur)
+  { 
+    size++;
+    cur = cur->next;
+  }
+  return size;
+}
+
+//Generate an array from a list
+void Array(int *p, list *X, int size)
+{
+  //allocate space for the array
+  memset(p, 0, size * sizeof(int));
+  node *cur;
+  cur = X->head;
+  int i = 0;
+  while (cur)
+  {
+    p[i] = cur->data;
+    cur = cur->next;
+    i++;
+  }
 }
