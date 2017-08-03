@@ -84,6 +84,7 @@ void SequenceDisplay(list *X)
   }
   printf("\n");  
 }
+
 //Find the size of a list
 int Size(list *X)
 {
@@ -99,7 +100,17 @@ int Size(list *X)
 }
 
 //Generate an array from a list
-int *Array(list *X, int size)
+void Array(int *p, list *X, int size)
 {
-
+  //allocate space for the array
+  memset(p, 0, size * sizeof(int));
+  node *cur;
+  cur = X->head;
+  int i = 0;
+  while (cur)
+  {
+    p[i] = cur->data;
+    cur = cur->next;
+    i++;
+  }
 }
