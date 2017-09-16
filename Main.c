@@ -7,6 +7,7 @@
 #include "./List.h"
 #include "./Render.h"
 #include "stdio.h"
+#include "png.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -45,8 +46,37 @@ int main( int argc, const char* argv[] )
   //  printf("%i", p[i]);
   //}
 
-  pixel_t *pixels;
-  memset(pixels, 0, 3 * sizeof(pixel_t));
+  
+  char* output = "output.png";
+
+  pixel_t pixels[3];
+  {
+    pixels[0].red = 100;
+    pixels[0].green = 100;
+    pixels[0].blue = 100;
+    pixels[0].alpha = 100;
+
+    pixels[1].red = 100;
+    pixels[1].green = 100;
+    pixels[1].blue = 100;
+    pixels[1].alpha = 255;
+    
+    pixels[2].red = 100;
+    pixels[2].green = 100;
+    pixels[2].blue = 100;
+    pixels[2].alpha = 200;
+  }
+
+  canvas_t canvas;
+  canvas.height = 1;
+  canvas.width = 3;
+  canvas.canvas_start = (pixel_t*)calloc(canvas.height*canvas.width, sizeof(pixel_t));
+  paint(&canvas, pixels, 0, 3);
+  
+  unsigned char* image;
+  rasterize(&canvas, image, 100, 100);
+
+  writeImage(output, 100 * canvas.width, 100 * canvas.height, image, "test");
 
   return 0;
 }
