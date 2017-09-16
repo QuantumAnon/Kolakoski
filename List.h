@@ -33,12 +33,12 @@ void Append(list *X, int z)
   list temp;
   temp = *X;
   if (temp.head == NULL) {
-    temp.head = (node*)malloc(sizeof(node)); //make a space big enough for a node and point to it
+    temp.head = (node*)calloc(sizeof(node)); //make a space big enough for a node and point to it
     temp.tail = temp.head; //point the head and tail to the same position
     temp.head->data = z; //the data contained in the node is z
     temp.head->next = NULL; //the new node points to nothing
   } else {
-    temp.tail->next = (node*)malloc(sizeof(node)); //point the tail to a space big enough for a node
+    temp.tail->next = (node*)calloc(sizeof(node)); //point the tail to a space big enough for a node
     temp.tail->next->data = z; //the data contained in the node is z
     temp.tail->next->next = NULL; //the new node points to nothing
     temp.tail = temp.tail->next; //the tail node now points to new node
