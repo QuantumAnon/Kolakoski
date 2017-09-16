@@ -7,6 +7,7 @@
 #pragma once
 
 #include "stdio.h"
+#include "png.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -60,3 +61,44 @@ void paint(canvas_t *canvas, pixel_t values[], int row, int width)
   }
 }
 
+//Convert a canvas to an RGBA pixel array
+void rasterize(canvas_t *canvas, unsigned char *image, unsigned int block_width, unsigned int block_height)
+{
+  //allocate memory
+  image = (unsigned char*)calloc(canvas->width * canvas->height * block_width * block_height * 4, sizeof(unsigned));
+  //image height and width
+  int img_height = canvas->height * block_height, img_width = canvas->width * block_width;
+
+  //left->right, top->down across blocks
+  for (int y = 0; y < canvas->height; y++) {
+    //top pixel of the block
+    unsigned anchor_y = y * block_height;
+    for (int x = 0; x < canvas->width; x++) {
+      //leftmost pixel of the block
+      unsigned anchor_x = x * block_width;
+
+      //pixel to represent
+      pixel_t cur = *pixel_at(canvas, x, y);
+
+      //left->right, top->down across a single block
+      for (int j = 0; j < block_height; j++) {
+        for (int i = 0; i < block_width; i++) {
+          //pixel_coord = (i+anchor_x, j+anchor_y)
+          unsigned pixel_number = (i+anchor_x) + (j + anchor_y)*img_width;
+
+          //assign values
+          image[4*pixel_number + 0] = cur.red;
+          image[4*pixel_number + 1] = cur.green;
+          image[4*pixel_number + 2] = cur.blue;
+          image[4*pixel_number + 3] = cur.alpha;
+        }
+      }
+    }
+  }
+}
+
+//write a canvas to file
+void write(const char* filename, const unsigned char* image, unsigned int width, unsigned int height)
+{
+  
+}
