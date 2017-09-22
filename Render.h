@@ -29,6 +29,15 @@ typedef struct
   size_t height;
 } canvas_t;
 
+//set the pixel data for a given pixel pointer
+void pixel_set(pixel_t *pixel, u_int8_t red, u_int8_t green, u_int8_t blue, u_int8_t alpha)
+{
+  pixel->red   = red;
+  pixel->green = green;
+  pixel->blue  = blue;
+  pixel->alpha = alpha;
+}
+
 //Find the pixel data at a specific position
 static pixel_t *pixel_at_canvas(canvas_t *canvas, int x, int y)
 {
@@ -48,7 +57,7 @@ void newCanvas(canvas_t *canvas, int width, int height)
 
 
 //Paint a row with a particular array of values, naively stretches a smaller array to fit the size needed
-void paint(canvas_t *canvas, pixel_t values[], int row, int width)
+void paint(canvas_t *canvas, pixel_t values[], int width, int row)
 {
   if ((row >= canvas->height) || (width > canvas->width)) { //check against canvas size
     return;
@@ -59,19 +68,13 @@ void paint(canvas_t *canvas, pixel_t values[], int row, int width)
   int cur = 0;
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < h_size; j++) {
-      pixel_at_canvas(canvas, i*h_size + j, row)->red   = values[cur].red;
-      pixel_at_canvas(canvas, i*h_size + j, row)->green = values[cur].green;
-      pixel_at_canvas(canvas, i*h_size + j, row)->blue  = values[cur].blue;
-      pixel_at_canvas(canvas, i*h_size + j, row)->alpha = values[cur].alpha;
+      pixel_set(pixel_at_canvas(canvas, i*h_size + j, row), values[cur].red, values[cur].green, values[cur].blue, values[cur].alpha);
     }
     cur++;
   }
 
   for (int i = cur * h_size; i < canvas->width; i++) {
-    pixel_at_canvas(canvas, i, row)->red   = 0;
-    pixel_at_canvas(canvas, i, row)->green = 0;
-    pixel_at_canvas(canvas, i, row)->blue  = 0;
-    pixel_at_canvas(canvas, i, row)->alpha = 0;
+    pixel_set(pixel_at_canvas(canvas, i, row), 0, 0, 0, 0);
   }
 }
 
@@ -99,10 +102,7 @@ void rasterize(canvas_t *canvas,  canvas_t *image, size_t block_width, size_t bl
       for (int j = 0; j < block_height; j++) {
         for (int i = 0; i < block_width; i++) {
           //assign values
-          pixel_at_canvas(image, anchor_x + i, anchor_y + j)->red   = cur.red;
-          pixel_at_canvas(image, anchor_x + i, anchor_y + j)->green = cur.green;
-          pixel_at_canvas(image, anchor_x + i, anchor_y + j)->blue  = cur.blue;
-          pixel_at_canvas(image, anchor_x + i, anchor_y + j)->alpha = cur.alpha;
+          pixel_set(pixel_at_canvas(image, anchor_x + i, anchor_y + j), cur.red, cur.green, cur.blue, cur.alpha);
         }
       }
     }
@@ -176,8 +176,8 @@ int writeImage(char* filename, canvas_t *image, char* title)
         pixel_t cur = *pixel_at_canvas(image, x, y);
 
         row[x*4 + 0] = cur.red;
-        row[x*4 + 1] = cur.blue;
-        row[x*4 + 2] = cur.green;
+        row[x*4 + 1] = cur.green;
+        row[x*4 + 2] = cur.blue;
         row[x*4 + 3] = cur.alpha;
      }
      png_write_row(png_ptr, row);
