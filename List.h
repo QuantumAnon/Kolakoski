@@ -1,4 +1,6 @@
-#pragma once
+#ifndef List_h
+#define List_h
+
 //====================
 //List.h
 //--------------------
@@ -8,7 +10,6 @@
 #include "stdio.h"
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -111,3 +112,5 @@ void Array(int *p, list *X, int size)
     i++;
   }
 }
+
+#endif

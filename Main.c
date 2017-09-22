@@ -10,7 +10,6 @@
 #include "png.h"
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -46,37 +45,43 @@ int main( int argc, const char* argv[] )
   //  printf("%i", p[i]);
   //}
 
-  
-  char* output = "output.png";
-
+  char *output = "test.png";
   pixel_t pixels[3];
-  {
-    pixels[0].red = 100;
-    pixels[0].green = 100;
-    pixels[0].blue = 100;
-    pixels[0].alpha = 100;
-
-    pixels[1].red = 100;
-    pixels[1].green = 100;
-    pixels[1].blue = 100;
-    pixels[1].alpha = 255;
-    
-    pixels[2].red = 100;
-    pixels[2].green = 100;
-    pixels[2].blue = 100;
-    pixels[2].alpha = 200;
+  for (int i = 0; i < 3; i++) {
+    pixels[i].red   = 100*i;
+    pixels[i].green = 100;
+    pixels[i].blue  = 100*i;
+    pixels[i].alpha = 0;
   }
 
-  canvas_t canvas;
-  canvas.height = 1;
-  canvas.width = 3;
-  canvas.canvas_start = (pixel_t*)calloc(canvas.height*canvas.width, sizeof(pixel_t));
-  paint(&canvas, pixels, 0, 3);
-  
-  unsigned char* image;
-  rasterize(&canvas, image, 100, 100);
 
-  writeImage(output, 100 * canvas.width, 100 * canvas.height, image, "test");
+  canvas_t canvas;
+  canvas_t image;
+  
+  newCanvas(&canvas, 7, 1);
+
+  paint(&canvas, pixels, 0, 3);
+
+  //for (int i = 0; i < canvas.width; i++) {
+  //  for (int j = 0; j < canvas.height; j++) {
+  //    printf("red   -(%i,%i)- %i\n", i, j, pixel_at(&canvas, i, j)->red);
+  //    printf("green -(%i,%i)- %i\n", i, j, pixel_at(&canvas, i, j)->green);
+  //    printf("blue  -(%i,%i)- %i\n", i, j, pixel_at(&canvas, i, j)->blue);
+  //    printf("alpha -(%i,%i)- %i\n", i, j, pixel_at(&canvas, i, j)->alpha);
+  //  }
+  //}
+
+  rasterize(&canvas, &image, 100, 100);
+  //for (int i = 0; i < image.width; i++) {
+  //  for (int j = 0; j < image.height; j++) {
+  //    printf("red   -(%i,%i)- %i\n", i, j, pixel_at_image(&image, i, j)->red);
+  //    printf("green -(%i,%i)- %i\n", i, j, pixel_at_image(&image, i, j)->green);
+  //    printf("blue  -(%i,%i)- %i\n", i, j, pixel_at_image(&image, i, j)->blue);
+  //    printf("alpha -(%i,%i)- %i\n", i, j, pixel_at_image(&image, i, j)->alpha);
+  //  }
+  //}
+
+  writeImage(output, &image, "test");
 
   return 0;
 }
