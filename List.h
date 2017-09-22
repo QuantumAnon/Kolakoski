@@ -1,4 +1,6 @@
-#pragma once
+#ifndef List_h
+#define List_h
+
 //====================
 //List.h
 //--------------------
@@ -8,7 +10,6 @@
 #include "stdio.h"
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -18,30 +19,27 @@ typedef struct node
 {
   int data;
   struct node *next;
-}node;
+} node;
 
 //A linked list of nodes
 typedef struct list
 {
   node *head;
   node *tail;
-}list;
+} list;
 
 //Appends a single value to the end of a list
 void Append(list *X, int z)
 {
   list temp;
   temp = *X;
-  if (temp.head == NULL)
-  {
-    temp.head = (node*)malloc(sizeof(node)); //make a space big enough for a node and point to it
+  if (temp.head == NULL) {
+    temp.head = (node*)calloc(1, sizeof(node)); //make a space big enough for a node and point to it
     temp.tail = temp.head; //point the head and tail to the same position
     temp.head->data = z; //the data contained in the node is z
     temp.head->next = NULL; //the new node points to nothing
-  }
-  else
-  {
-    temp.tail->next = (node*)malloc(sizeof(node)); //point the tail to a space big enough for a node
+  } else {
+    temp.tail->next = (node*)calloc(1, sizeof(node)); //point the tail to a space big enough for a node
     temp.tail->next->data = z; //the data contained in the node is z
     temp.tail->next->next = NULL; //the new node points to nothing
     temp.tail = temp.tail->next; //the tail node now points to new node
@@ -53,8 +51,7 @@ void Append(list *X, int z)
 //Appends multiple copies of the same value to the end of a list
 void MultiAppend(list *X, int n, int z)
 {
-  for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     Append(X,z);
   }
 }
@@ -64,12 +61,12 @@ void Display(list *X)
 {
   node *cur;
   cur = X->head;
+
   printf("start->");
-  while (cur)
-  {
-    printf("%d->",cur->data); 
+  while (cur) {
+    printf("%d->",cur->data);
     cur = cur->next;
-  }  
+  }
   printf("end!\n");
 }
 
@@ -78,11 +75,12 @@ void SequenceDisplay(list *X)
 {
   node *cur;
   cur = X->head;
-  while (cur){
-    printf("%d, ",cur->data); 
+
+  while (cur) {
+    printf("%d, ",cur->data);
     cur = cur->next;
   }
-  printf("\n");  
+  printf("\n");
 }
 
 //Find the size of a list
@@ -91,8 +89,8 @@ int Size(list *X)
   node *cur;
   cur = X->head;
   int size = 0;
-  while (cur)
-  { 
+
+  while (cur) {
     size++;
     cur = cur->next;
   }
@@ -100,17 +98,18 @@ int Size(list *X)
 }
 
 //Generate an array from a list
-void Array(int *p, list *X, int size)
+void Array(int *p, list *X)
 {
   //allocate space for the array
-  memset(p, 0, size * sizeof(int));
   node *cur;
   cur = X->head;
   int i = 0;
-  while (cur)
-  {
+
+  while (cur) {
     p[i] = cur->data;
     cur = cur->next;
     i++;
   }
 }
+
+#endif
