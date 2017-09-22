@@ -21,13 +21,13 @@ typedef struct
   u_int8_t alpha;
 } pixel_t;
 
-//A canvas of pixel values, this does not necessarily correspond to actual pixel sizes as canvases can be "blockified"
+//A 2D array of pixel values, this does not necessarily correspond to actual pixel sizes as these can be "blockified"
 typedef struct
 {
-  pixel_t *canvas_start;
+  pixel_t *image_start;
   size_t width;
   size_t height;
-} canvas_t;
+} image_t;
 
 //set the pixel data for a given pixel pointer
 void pixel_set(pixel_t *pixel, u_int8_t red, u_int8_t green, u_int8_t blue, u_int8_t alpha)
@@ -39,83 +39,90 @@ void pixel_set(pixel_t *pixel, u_int8_t red, u_int8_t green, u_int8_t blue, u_in
 }
 
 //Find the pixel data at a specific position
-static pixel_t *pixel_at_canvas(canvas_t *canvas, int x, int y)
+static pixel_t *pixel_at(image_t *image, int x, int y)
 {
-  if ((x >= canvas->width) || (y >= canvas->height)) { //check if pixel requested is within canvas size
+  if ((x >= image->width) || (y >= image->height)) { //check if pixel requested is within canvas size
     return NULL;
   } else { //if it is, return start pixel plus distances, pixel is wrapped much like a scanline system
-    return (canvas->canvas_start + x + y * canvas->width);
+    return (image->image_start + x + y * image->width);
   }
 }
 
-void newCanvas(canvas_t *canvas, int width, int height)
+//generate a new image with a certain width and height
+void newImage(image_t *image, int width, int height)
 {
-  canvas->width = width;
-  canvas->height = height;
-  canvas->canvas_start = (pixel_t*)calloc(canvas->height*canvas->width, sizeof(pixel_t));
+  image->width = width;
+  image->height = height;
+  image->image_start = (pixel_t*)calloc(image->height*image->width, sizeof(pixel_t));
 }
 
 
 //Paint a row with a particular array of values, naively stretches a smaller array to fit the size needed
-void paint(canvas_t *canvas, pixel_t values[], int width, int row)
+void paint(image_t *image, pixel_t values[], int width, int row)
 {
-  if ((row >= canvas->height) || (width > canvas->width)) { //check against canvas size
+  if ((row >= image->height) || (width > image->width)) { //check against canvas size
     return;
   }
   //naive stretching, leaves a blank space at the end if there is a remainder
-  int h_size = canvas->width / width;
+  int h_size = image->width / width;
 
   int cur = 0;
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < h_size; j++) {
-      pixel_set(pixel_at_canvas(canvas, i*h_size + j, row), values[cur].red, values[cur].green, values[cur].blue, values[cur].alpha);
+      pixel_set(pixel_at(image, i*h_size + j, row), values[cur].red, values[cur].green, values[cur].blue, values[cur].alpha);
     }
     cur++;
   }
 
-  for (int i = cur * h_size; i < canvas->width; i++) {
-    pixel_set(pixel_at_canvas(canvas, i, row), 0, 0, 0, 0);
+  for (int i = cur * h_size; i < image->width; i++) {
+    pixel_set(pixel_at(image, i, row), 0, 0, 0, 0);
   }
 }
 
-//Convert a canvas to an RGBA pixel array
-void rasterize(canvas_t *canvas,  canvas_t *image, size_t block_width, size_t block_height)
+//Convert an image to an RGBA pixel array
+void rasterize(image_t *pre_image,  image_t *image, size_t block_width, size_t block_height)
 {
   //allocate memory
-  image->canvas_start = (pixel_t*)calloc(canvas->width * canvas->height * block_width * block_height, sizeof(pixel_t));
+  image->image_start = (pixel_t*)calloc(pre_image->width * block_width * pre_image->height * block_height, sizeof(pixel_t));
   //image height and width
-  image->height = canvas->height * block_height, image->width = canvas->width * block_width;
+  image->height = pre_image->height * block_height, image->width = pre_image->width * block_width;
 
 
   //left->right, top->down across blocks
-  for (int y = 0; y < canvas->height; y++) {
+  for (int y = 0; y < pre_image->height; y++) {
     //top pixel of the block
     unsigned anchor_y = y * block_height;
-    for (int x = 0; x < canvas->width; x++) {
+    for (int x = 0; x < pre_image->width; x++) {
       //leftmost pixel of the block
       unsigned anchor_x = x * block_width;
 
       //pixel to represent
-      pixel_t cur = *pixel_at_canvas(canvas, x, y);
+      pixel_t cur = *pixel_at(pre_image, x, y);
 
       //left->right, top->down across a single block
       for (int j = 0; j < block_height; j++) {
         for (int i = 0; i < block_width; i++) {
           //assign values
-          pixel_set(pixel_at_canvas(image, anchor_x + i, anchor_y + j), cur.red, cur.green, cur.blue, cur.alpha);
+          pixel_set(pixel_at(image, anchor_x + i, anchor_y + j), cur.red, cur.green, cur.blue, cur.alpha);
         }
       }
     }
   }
 }
 
-//write a canvas to file
-int writeImage(char* filename, canvas_t *image, char* title)
+//shamelessly copied from the LibPNG manual
+//write an image to file
+int writeImage(char* filename, image_t *image, char* title)
 {
+  //initial code
   int code = 0;
+  //pointer for the file
   FILE *fp = NULL;
+  //pointer for the png image
   png_structp png_ptr = NULL;
+  //pointer for the png info
   png_infop info_ptr = NULL;
+  //pointer for a single row
   png_bytep row = NULL;
 
   // Open file for writing (binary mode)
@@ -149,6 +156,7 @@ int writeImage(char* filename, canvas_t *image, char* title)
      goto finalise;
   }
 
+  //initialise I/O
   png_init_io(png_ptr, fp);
 
   // Write header (8 bit colour depth)
@@ -163,7 +171,9 @@ int writeImage(char* filename, canvas_t *image, char* title)
      png_set_text(png_ptr, info_ptr, &title_text, 1);
   }
 
+  //invert alpha channel
   png_set_invert_alpha(png_ptr);
+  //setup write info
   png_write_info(png_ptr, info_ptr);
 
   // Allocate memory for one row (4 bytes per pixel - RGBA)
@@ -173,7 +183,7 @@ int writeImage(char* filename, canvas_t *image, char* title)
   int x, y;
   for (y=0 ; y < image->height ; y++) {
      for (x=0 ; x < image->width ; x++) {
-        pixel_t cur = *pixel_at_canvas(image, x, y);
+        pixel_t cur = *pixel_at(image, x, y);
 
         row[x*4 + 0] = cur.red;
         row[x*4 + 1] = cur.green;

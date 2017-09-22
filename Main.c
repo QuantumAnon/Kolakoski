@@ -41,9 +41,9 @@ int main( int argc, const char* argv[] )
 {
   pixel_t *pixels[100];
   char *output = "test.png";
-  canvas_t canvas;
-  canvas_t image;
-  newCanvas(&canvas, 200, 100);
+  image_t canvas;
+  image_t image;
+  newImage(&canvas, 200, 100);
 
   for (int i = 0; i <= 100; i++) {
     list K = Kolakoski(i + 3);
