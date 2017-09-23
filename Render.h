@@ -66,20 +66,18 @@ void paint(image_t *image, pixel_t values[], int width, int row)
   //naive stretching, leaves a blank space at the end if there is a remainder
   int h_size = image->width / width;
 
-  int cur = 0;
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < h_size; j++) {
-      pixel_set(pixel_at(image, i*h_size + j, row), values[cur].red, values[cur].green, values[cur].blue, values[cur].alpha);
+      pixel_set(pixel_at(image, i*h_size + j, row), values[i].red, values[i].green, values[i].blue, values[i].alpha);
     }
-    cur++;
   }
 
-  for (int i = cur * h_size; i < image->width; i++) {
+  for (int i = width * h_size; i < image->width; i++) {
     pixel_set(pixel_at(image, i, row), 0, 0, 0, 0);
   }
 }
 
-//Convert an image to an RGBA pixel array
+//Convert an image to a properly sized RGBA pixel array
 void rasterize(image_t *pre_image,  image_t *image, size_t block_width, size_t block_height)
 {
   //allocate memory
@@ -114,7 +112,7 @@ void rasterize(image_t *pre_image,  image_t *image, size_t block_width, size_t b
 //write an image to file
 int writeImage(char* filename, image_t *image, char* title)
 {
-  //initial code
+  //initial code, does something but I'm not sure what
   int code = 0;
   //pointer for the file
   FILE *fp = NULL;
@@ -191,7 +189,6 @@ int writeImage(char* filename, image_t *image, char* title)
         row[x*4 + 3] = cur.alpha;
      }
      png_write_row(png_ptr, row);
-     //printf("at row %d\n", y);
   }
 
   // End write
