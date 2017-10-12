@@ -57,7 +57,7 @@ void MultiAppend(list *X, int n, int z)
 }
 
 //Displays a list on a single line
-void Display(list *X)
+void LineDisplay(list *X)
 {
   node *cur;
   cur = X->head;
@@ -65,12 +65,12 @@ void Display(list *X)
   printf("start->");
   while (cur) {
     printf("%d->",cur->data);
-    cur = cur->next;
+    cur = cur->next; //move to next pointer
   }
   printf("end!\n");
 }
 
-//Displays a list on a single line
+//Displays a list on a single line without arrows
 void SequenceDisplay(list *X)
 {
   node *cur;
@@ -83,24 +83,23 @@ void SequenceDisplay(list *X)
   printf("\n");
 }
 
-//Find the size of a list
-int Size(list *X)
+//Find the Length of a list
+int Length(list *X)
 {
   node *cur;
   cur = X->head;
-  int size = 0;
+  int Length = 0;
 
   while (cur) {
-    size++;
+    Length++;
     cur = cur->next;
   }
-  return size;
+  return Length;
 }
 
-//Generate an array from a list
+//Generate an array from a list, array must have preallocated Length
 void Array(int *p, list *X)
 {
-  //allocate space for the array
   node *cur;
   cur = X->head;
   int i = 0;
