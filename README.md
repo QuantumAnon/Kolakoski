@@ -7,6 +7,8 @@ The aim of this program is to generate and display the Kolakoski sequence in an 
 
 ## What it does so far
 
-The program can render a not paritcularly enlightening image of the Kolakoski sequence (shown below), which demonstrates a few of its interesting features.
-The current aim is to amend the generation and display process so that a clearer image is produced.
-![An image showing some of the properties of the Kolakoski sequence](./kolakoskiTest.png "A not particularly good rendering of the Kolakoski sequence")
+The program has moved beyond displaying the image shown below and now generates a much clearer image of the sequence.
+![An image showing some of the properties of the Kolakoski sequence](./Assets/oldTest.png "A not particularly good rendering of the Kolakoski sequence")
+
+![A better image of the Kolakoski sequence](./test.png "A more detailed, but still flawed image of the Kolakoski sequnce")
+The new image shows a little of the recursive nature of the sequence but it still is a bit rough around the edges. Fixing these is the next step.
