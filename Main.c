@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+// generate a Kolakoski sequence
 list Kolakoski(int n)
 {
   list K;
@@ -39,8 +40,9 @@ list Kolakoski(int n)
 
 int main( int argc, const char* argv[] )
 {
-  //init variables
+  // init variables
   int rndr_w, rndr_h, blck_w, blck_h;
+  // how much of a line should be blank before it should be extended
   float blankTolerance;
 
 
@@ -51,23 +53,23 @@ int main( int argc, const char* argv[] )
   blck_h = 500;
   blankTolerance = 0.1;
 
-  //jagged array representing actual pixels
+  // jagged array representing actual pixels
   pixel_t *pixels[rndr_h];
 
-  //filename
+  // filename
   char *output = "test.png";
 
-  //canvas to draw on
+  // canvas to draw on
   image_t canvas;
-  //image to render
+  // image to render
   image_t image;
 
-  //canvas is rndr_w x rndr_h
+  // canvas is rndr_w x rndr_h
   newImage(&canvas, rndr_w, rndr_h);
 
   int oldLength = 0;
 
-  //from 0 to the height of the render
+  // from 0 to the height of the render
   for (int i = 0; i < rndr_h; i += 1) {
     int c = i - 1;
     list K;
@@ -75,16 +77,16 @@ int main( int argc, const char* argv[] )
 
     do {
       c++;
-      //generate Kolakoski sequence using c iterations
+      // generate Kolakoski sequence using c iterations
       K = Kolakoski(c);
       n = Length(&K);
     } while ((n % rndr_w > blankTolerance * rndr_w) || (n < 2 * oldLength));
     oldLength = n;
     
-    //printf("%i -- %i\n", i + 3, n);
+    // printf("%i -- %i\n", i + 3, n);
     int p[n];
     Array(p, &K);
-    //int max = (n < 150) ? n : 50;
+    // int max = (n < 150) ? n : 50;
     pixels[i] = (pixel_t*)calloc(n,sizeof(pixel_t));
 
     for (int k = 0; k < n; k++) {
